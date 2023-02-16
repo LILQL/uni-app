@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@escook/request-miniprogram": "^0.2.1"
+  },
+  "name": "testa_uni",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LILQL/uni-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LILQL/uni-app/issues"
+  },
+  "homepage": "https://github.com/LILQL/uni-app#readme",
+  "description": ""
+}
