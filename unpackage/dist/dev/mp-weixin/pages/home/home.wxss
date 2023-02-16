@@ -6,12 +6,11 @@ swiper {
 swiper .swiper-item,
 swiper image {
   width: 100%;
-  height: 100%;
 }
 .nav-list {
   display: flex;
   justify-content: space-around;
-  margin: 30rpx 0;
+  margin: 15rpx 0;
 }
 .nav-list image {
   width: 128rpx;
@@ -20,13 +19,12 @@ swiper image {
 .floor-title {
   height: 60rpx;
   width: 100%;
-  display: flex;
 }
 .floor-img-box {
   display: flex;
-  padding-left: 10rpx;
+  padding-left: 15rpx;
 }
-.right-img-box {
+.floor-img-box .right-img-box {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;

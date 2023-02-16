@@ -17,7 +17,7 @@
 		<!-- 楼层区域 -->
 		<view class="floor-list">
 			<!-- 楼层item项 -->
-			<view class="floor-item" v-for="(item,index) in floorList" :key="index">
+			<view class="floor-item" v-for="(item,i) in floorList" :key="i">
 				<!-- 楼层标题 -->
 				<image class="floor-title" :src="item.floor_title.image_src"></image>
 				<!-- 楼层图片区域 -->
@@ -29,10 +29,10 @@
 					</navigator>
 					<!-- 右侧 4个小图片 -->
 					<view class="right-img-box">
-					    <navigator class="right-img-item" v-for="(item2, i2) in item.product_list" :key="i2" v-if="i2 !== 0" :url="item2.url">
-					      <image :src="item2.image_src" mode="widthFix" :style="{width: item2.image_width + 'rpx'}"></image>
-					    </navigator>
-					  </view>
+						<navigator class="right-img-item" v-for="(item2,i2) in item.product_list" :key="i2" :url="item2.url" v-if="i2 !== 0">
+							<image :src="item2.image_src" :style="{width: item2.image_width+'rpx'}" mode="widthFix">
+							</image>
+						</navigator>
 					</view>
 				</view>
 			</view>
@@ -112,13 +112,13 @@
 		.swiper-item,
 		image {
 			width: 100%;
-			height: 100%;
+			//height: 100%;
 		}
 	}
 	.nav-list {
 		display: flex;
 		justify-content: space-around;
-		margin: 30rpx 0;
+		margin: 15rpx 0;
 		image {
 			width: 128rpx;
 			height: 140rpx;
@@ -127,15 +127,16 @@
 	.floor-title {
 		height: 60rpx;
 		width: 100%;
-		display: flex;
+		//display: flex;
 	}
 	.floor-img-box {
 		display: flex;
-		padding-left: 10rpx;
+		padding-left: 15rpx;
+		.right-img-box {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-around;
+		}
 	}
-	.right-img-box {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-around;
-	}
+	
 </style>

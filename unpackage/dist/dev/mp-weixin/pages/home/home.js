@@ -69,26 +69,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: common_vendor.o(($event) => $options.navClickHandler(item), index)
       };
     }),
-    c: common_vendor.f($data.floorList, (item, index, i0) => {
+    c: common_vendor.f($data.floorList, (item, i, i0) => {
       return common_vendor.e({
         a: item.floor_title.image_src,
         b: item.product_list[0].image_src,
         c: item.product_list[0].image_width + "rpx",
-        d: item.product_list[0].url,
-        e: index !== 0
-      }, index !== 0 ? {
-        f: common_vendor.f(item.product_list, (item2, index2, i1) => {
+        d: item.product_list[0].url
+      }, _ctx.i2 !== 0 ? {
+        e: common_vendor.f(item.product_list, (item2, i2, i1) => {
           return {
             a: item2.image_src,
             b: item2.image_width + "rpx",
-            c: index2,
+            c: i2,
             d: item2.url
           };
         })
       } : {}, {
-        g: index
+        f: i
       });
-    })
+    }),
+    d: _ctx.i2 !== 0
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "D:/HBuilderXProjects/testa_uni/pages/home/home.vue"]]);
