@@ -14,28 +14,6 @@ function makeMap(str, expectsLowerCase) {
   }
   return expectsLowerCase ? (val) => !!map[val.toLowerCase()] : (val) => !!map[val];
 }
-const toDisplayString = (val) => {
-  return isString(val) ? val : val == null ? "" : isArray(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
-};
-const replacer = (_key, val) => {
-  if (val && val.__v_isRef) {
-    return replacer(_key, val.value);
-  } else if (isMap(val)) {
-    return {
-      [`Map(${val.size})`]: [...val.entries()].reduce((entries, [key, val2]) => {
-        entries[`${key} =>`] = val2;
-        return entries;
-      }, {})
-    };
-  } else if (isSet(val)) {
-    return {
-      [`Set(${val.size})`]: [...val.values()]
-    };
-  } else if (isObject(val) && !isArray(val) && !isPlainObject(val)) {
-    return String(val);
-  }
-  return val;
-};
 const EMPTY_OBJ = Object.freeze({});
 const EMPTY_ARR = Object.freeze([]);
 const NOOP = () => {
@@ -290,8 +268,8 @@ const E = function() {
 };
 E.prototype = {
   on: function(name, callback, ctx) {
-    var e2 = this.e || (this.e = {});
-    (e2[name] || (e2[name] = [])).push({
+    var e = this.e || (this.e = {});
+    (e[name] || (e[name] = [])).push({
       fn: callback,
       ctx
     });
@@ -317,8 +295,8 @@ E.prototype = {
     return this;
   },
   off: function(name, callback) {
-    var e2 = this.e || (this.e = {});
-    var evts = e2[name];
+    var e = this.e || (this.e = {});
+    var evts = e[name];
     var liveEvents = [];
     if (evts && callback) {
       for (var i = 0, len = evts.length; i < len; i++) {
@@ -326,7 +304,7 @@ E.prototype = {
           liveEvents.push(evts[i]);
       }
     }
-    liveEvents.length ? e2[name] = liveEvents : delete e2[name];
+    liveEvents.length ? e[name] = liveEvents : delete e[name];
     return this;
   }
 };
@@ -439,9 +417,9 @@ function assertType$1(value, type) {
   let valid;
   const expectedType = getType$1(type);
   if (isSimpleType$1(expectedType)) {
-    const t2 = typeof value;
-    valid = t2 === expectedType.toLowerCase();
-    if (!valid && t2 === "object") {
+    const t = typeof value;
+    valid = t === expectedType.toLowerCase();
+    if (!valid && t === "object") {
       valid = value instanceof type;
     }
   } else if (expectedType === "Object") {
@@ -497,8 +475,8 @@ function tryCatch(fn) {
   return function() {
     try {
       return fn.apply(fn, arguments);
-    } catch (e2) {
-      console.error(e2);
+    } catch (e) {
+      console.error(e);
     }
   };
 }
@@ -680,8 +658,8 @@ function promisify$1(name, fn) {
     if (hasCallback(args)) {
       return wrapperReturnValue(name, invokeApi(name, fn, args, rest));
     }
-    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
-      invokeApi(name, fn, extend(args, { success: resolve2, fail: reject }), rest);
+    return wrapperReturnValue(name, handlePromise(new Promise((resolve, reject) => {
+      invokeApi(name, fn, extend(args, { success: resolve, fail: reject }), rest);
     })));
   };
 }
@@ -933,7 +911,7 @@ let enabled;
 function normalizePushMessage(message) {
   try {
     return JSON.parse(message);
-  } catch (e2) {
+  } catch (e) {
   }
   return message;
 }
@@ -973,7 +951,7 @@ function invokeGetPushCidCallbacks(cid2, errMsg) {
   getPushCidCallbacks.length = 0;
 }
 const API_GET_PUSH_CLIENT_ID = "getPushClientId";
-const getPushClientId = defineAsyncApi(API_GET_PUSH_CLIENT_ID, (_, { resolve: resolve2, reject }) => {
+const getPushClientId = defineAsyncApi(API_GET_PUSH_CLIENT_ID, (_, { resolve, reject }) => {
   Promise.resolve().then(() => {
     if (typeof enabled === "undefined") {
       enabled = false;
@@ -982,7 +960,7 @@ const getPushClientId = defineAsyncApi(API_GET_PUSH_CLIENT_ID, (_, { resolve: re
     }
     getPushCidCallbacks.push((cid2, errMsg) => {
       if (cid2) {
-        resolve2({ cid: cid2 });
+        resolve({ cid: cid2 });
       } else {
         reject(errMsg);
       }
@@ -1047,9 +1025,9 @@ function promisify(name, api) {
     if (isFunction(options.success) || isFunction(options.fail) || isFunction(options.complete)) {
       return wrapperReturnValue(name, invokeApi(name, api, options, rest));
     }
-    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
+    return wrapperReturnValue(name, handlePromise(new Promise((resolve, reject) => {
       invokeApi(name, api, extend({}, options, {
-        success: resolve2,
+        success: resolve,
         fail: reject
       }), rest);
     })));
@@ -2275,9 +2253,6 @@ function isReadonly(value) {
 function isShallow(value) {
   return !!(value && value["__v_isShallow"]);
 }
-function isProxy(value) {
-  return isReactive(value) || isReadonly(value);
-}
 function toRaw(observed) {
   const raw = observed && observed["__v_raw"];
   return raw ? toRaw(raw) : observed;
@@ -2618,8 +2593,8 @@ const resolvedPromise = /* @__PURE__ */ Promise.resolve();
 let currentFlushPromise = null;
 const RECURSION_LIMIT = 100;
 function nextTick(fn) {
-  const p2 = currentFlushPromise || resolvedPromise;
-  return fn ? p2.then(this ? fn.bind(this) : fn) : p2;
+  const p = currentFlushPromise || resolvedPromise;
+  return fn ? p.then(this ? fn.bind(this) : fn) : p;
 }
 function findInsertionIndex(id) {
   let start = flushIndex + 1;
@@ -3248,37 +3223,6 @@ function validateDirectiveName(name) {
   if (isBuiltInDirective(name)) {
     warn$1("Do not use built-in directive ids as custom directive id: " + name);
   }
-}
-const COMPONENTS = "components";
-function resolveComponent(name, maybeSelfReference) {
-  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
-}
-function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
-  const instance = currentRenderingInstance || currentInstance;
-  if (instance) {
-    const Component2 = instance.type;
-    if (type === COMPONENTS) {
-      const selfName = getComponentName(Component2, false);
-      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) {
-        return Component2;
-      }
-    }
-    const res = resolve(instance[type] || Component2[type], name) || resolve(instance.appContext[type], name);
-    if (!res && maybeSelfReference) {
-      return Component2;
-    }
-    if (warnMissing && !res) {
-      const extra = type === COMPONENTS ? `
-If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.` : ``;
-      warn$1(`Failed to resolve ${type.slice(0, -1)}: ${name}${extra}`);
-    }
-    return res;
-  } else {
-    warn$1(`resolve${capitalize(type.slice(0, -1))} can only be used in render() or setup().`);
-  }
-}
-function resolve(registry, name) {
-  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
 }
 const getPublicInstance = (i) => {
   if (!i)
@@ -4081,7 +4025,7 @@ function isSameType(a, b) {
 }
 function getTypeIndex(type, expectedTypes) {
   if (isArray(expectedTypes)) {
-    return expectedTypes.findIndex((t2) => isSameType(t2, type));
+    return expectedTypes.findIndex((t) => isSameType(t, type));
   } else if (isFunction(expectedTypes)) {
     return isSameType(expectedTypes, type) ? 0 : -1;
   }
@@ -4129,9 +4073,9 @@ function assertType(value, type) {
   let valid;
   const expectedType = getType(type);
   if (isSimpleType(expectedType)) {
-    const t2 = typeof value;
-    valid = t2 === expectedType.toLowerCase();
-    if (!valid && t2 === "object") {
+    const t = typeof value;
+    valid = t === expectedType.toLowerCase();
+    if (!valid && t === "object") {
       valid = value instanceof type;
     }
   } else if (expectedType === "Object") {
@@ -4336,12 +4280,6 @@ const Static = Symbol("Static");
 function isVNode(value) {
   return value ? value.__v_isVNode === true : false;
 }
-const InternalObjectKey = `__vInternal`;
-function guardReactiveProps(props) {
-  if (!props)
-    return null;
-  return isProxy(props) || InternalObjectKey in props ? extend({}, props) : props;
-}
 const emptyAppContext = createAppContext();
 let uid$1 = 0;
 function createComponentInstance(vnode, parent, suspense) {
@@ -4416,7 +4354,6 @@ function createComponentInstance(vnode, parent, suspense) {
   return instance;
 }
 let currentInstance = null;
-const getCurrentInstance = () => currentInstance || currentRenderingInstance;
 const setCurrentInstance = (instance) => {
   currentInstance = instance;
   instance.scope.on();
@@ -4746,8 +4683,8 @@ function nextTick$1(instance, fn) {
       _resolve(instance.proxy);
     }
   });
-  return new Promise((resolve2) => {
-    _resolve = resolve2;
+  return new Promise((resolve) => {
+    _resolve = resolve;
   });
 }
 function clone(src, seen) {
@@ -5111,8 +5048,8 @@ function setupRenderEffect(instance) {
   update.id = instance.uid;
   toggleRecurse(instance, true);
   {
-    effect.onTrack = instance.rtc ? (e2) => invokeArrayFns$1(instance.rtc, e2) : void 0;
-    effect.onTrigger = instance.rtg ? (e2) => invokeArrayFns$1(instance.rtg, e2) : void 0;
+    effect.onTrack = instance.rtc ? (e) => invokeArrayFns$1(instance.rtc, e) : void 0;
+    effect.onTrigger = instance.rtg ? (e) => invokeArrayFns$1(instance.rtg, e) : void 0;
     update.ownerInstance = instance;
   }
   update();
@@ -5326,11 +5263,6 @@ function initApp(app) {
   }
 }
 const propsCaches = /* @__PURE__ */ Object.create(null);
-function renderProps(props) {
-  const { uid: uid2, __counter } = getCurrentInstance();
-  const propsId = (propsCaches[uid2] || (propsCaches[uid2] = [])).push(guardReactiveProps(props)) - 1;
-  return uid2 + "," + propsId + "," + __counter;
-}
 function pruneComponentPropsCache(uid2) {
   delete propsCaches[uid2];
 }
@@ -5371,94 +5303,6 @@ function getCreateApp() {
     return my[method];
   }
 }
-function vOn(value, key) {
-  const instance = getCurrentInstance();
-  const ctx = instance.ctx;
-  const extraKey = typeof key !== "undefined" && (ctx.$mpPlatform === "mp-weixin" || ctx.$mpPlatform === "mp-qq") && (isString(key) || typeof key === "number") ? "_" + key : "";
-  const name = "e" + instance.$ei++ + extraKey;
-  const mpInstance = ctx.$scope;
-  if (!value) {
-    delete mpInstance[name];
-    return name;
-  }
-  const existingInvoker = mpInstance[name];
-  if (existingInvoker) {
-    existingInvoker.value = value;
-  } else {
-    mpInstance[name] = createInvoker(value, instance);
-  }
-  return name;
-}
-function createInvoker(initialValue, instance) {
-  const invoker = (e2) => {
-    patchMPEvent(e2);
-    let args = [e2];
-    if (e2.detail && e2.detail.__args__) {
-      args = e2.detail.__args__;
-    }
-    const eventValue = invoker.value;
-    const invoke = () => callWithAsyncErrorHandling(patchStopImmediatePropagation(e2, eventValue), instance, 5, args);
-    const eventTarget = e2.target;
-    const eventSync = eventTarget ? eventTarget.dataset ? eventTarget.dataset.eventsync === "true" : false : false;
-    if (bubbles.includes(e2.type) && !eventSync) {
-      setTimeout(invoke);
-    } else {
-      const res = invoke();
-      if (e2.type === "input" && (isArray(res) || isPromise(res))) {
-        return;
-      }
-      return res;
-    }
-  };
-  invoker.value = initialValue;
-  return invoker;
-}
-const bubbles = [
-  "tap",
-  "longpress",
-  "longtap",
-  "transitionend",
-  "animationstart",
-  "animationiteration",
-  "animationend",
-  "touchforcechange"
-];
-function patchMPEvent(event) {
-  if (event.type && event.target) {
-    event.preventDefault = NOOP;
-    event.stopPropagation = NOOP;
-    event.stopImmediatePropagation = NOOP;
-    if (!hasOwn(event, "detail")) {
-      event.detail = {};
-    }
-    if (hasOwn(event, "markerId")) {
-      event.detail = typeof event.detail === "object" ? event.detail : {};
-      event.detail.markerId = event.markerId;
-    }
-    if (isPlainObject(event.detail) && hasOwn(event.detail, "checked") && !hasOwn(event.detail, "value")) {
-      event.detail.value = event.detail.checked;
-    }
-    if (isPlainObject(event.detail)) {
-      event.target = extend({}, event.target, event.detail);
-    }
-  }
-}
-function patchStopImmediatePropagation(e2, value) {
-  if (isArray(value)) {
-    const originalStop = e2.stopImmediatePropagation;
-    e2.stopImmediatePropagation = () => {
-      originalStop && originalStop.call(e2);
-      e2._stopped = true;
-    };
-    return value.map((fn) => (e3) => !e3._stopped && fn(e3));
-  } else {
-    return value;
-  }
-}
-const o = (value, key) => vOn(value, key);
-const e = (target, ...sources) => extend(target, ...sources);
-const t = (val) => toDisplayString(val);
-const p = (props) => renderProps(props);
 function createApp$1(rootComponent, rootProps = null) {
   rootComponent && (rootComponent.mpType = "app");
   return createVueApp(rootComponent, rootProps).use(plugin);
@@ -6243,9 +6087,3 @@ const createSubpackageApp = initCreateSubpackageApp();
 }
 exports._export_sfc = _export_sfc;
 exports.createSSRApp = createSSRApp;
-exports.e = e;
-exports.index = index;
-exports.o = o;
-exports.p = p;
-exports.resolveComponent = resolveComponent;
-exports.t = t;
